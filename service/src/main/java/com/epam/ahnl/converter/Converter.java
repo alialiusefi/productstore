@@ -1,5 +1,9 @@
 package com.epam.ahnl.converter;
 
-public class Converter {
+public interface Converter<D, E> {
+
+    E toEntity(D dto);
+
+    D toDTO(E entity);
 
 }

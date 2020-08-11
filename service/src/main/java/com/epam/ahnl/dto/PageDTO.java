@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class PageDTO<T> {
 
-  private List<T> dtos;
+  private List<T> results;
 
   private Long totalResults;
 

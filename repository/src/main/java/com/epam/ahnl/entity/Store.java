@@ -1,6 +1,5 @@
 package com.epam.ahnl.entity;
 
-
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -30,10 +29,10 @@ public class Store {
 
   private String phone;
 
-  @OneToOne
+  @OneToOne(orphanRemoval = true)
   private Address address;
 
-  @OneToOne
+  @OneToOne(orphanRemoval = true)
   private GeoLocation geoLocation;
 
   @Enumerated(EnumType.STRING)

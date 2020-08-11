@@ -10,10 +10,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
+@Data
 @Entity
 public class Address {
 

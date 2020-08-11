@@ -23,10 +23,10 @@ create table store
     name           varchar(100) not null,
     phone          varchar(50)  not null,
     address_id     bigint       not null,
-    geolocation_id bigint       not null,
+    geo_location_id bigint       not null,
     company_code   varchar(2)   not null,
     constraint STORE_ID_PK primary key (id),
-    constraint ADDRESS_ID_FK foreign key (address_id) references address on delete cascade,
-    constraint GEOLOCATION_ID_FK foreign key (geolocation_id) references geo_location on delete cascade
+    constraint ADDRESS_ID_FK foreign key (address_id) references address,
+    constraint GEOLOCATION_ID_FK foreign key (geo_location_id) references geo_location
 );
 
