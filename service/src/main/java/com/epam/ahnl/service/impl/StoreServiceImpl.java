@@ -78,7 +78,6 @@ public class StoreServiceImpl implements StoreService {
         .build();
   }
 
-  //todo: optional getNearestStore
   @Override
   public StoreDTO getNearestStoreByCompanyCode(
       Double latitude, Double longitude, CompanyCode code) {

@@ -30,17 +30,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-/*
-import org.junit.jupiter.api.extension.ExtendWith;
-*/
-/*import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;*//*
-
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-*/
 
 @ExtendWith(SpringExtension.class)
 class StoreServiceImplTest {
@@ -57,8 +48,7 @@ class StoreServiceImplTest {
   public GeoLocationConverter geoLocationConverter;
   @Mock
   public AddressConverter addressConverter;
-  @Mock
-  public ModelMapper modelMapper;
+
   public StoreService storeService;
 
   public List<Address> addressList;
@@ -144,16 +134,85 @@ class StoreServiceImplTest {
   }
 
   @Test
-  void getNearestStoreByCompanyCode() {}
+  void getNearestStoreByCompanyCode() {
+    Pageable pageRequest = Pageable.unpaged();
+    Page<Store> page =
+        new PageImpl<Store>(
+            Arrays.asList(stores.get(1), stores.get(2)),
+            pageRequest,
+            2L);
+    Store store = stores.get(2);
+    StoreDTO dto = storeDTOList.get(2);
+    CompanyCode code = CompanyCode.ET;
+
+    doReturn(page).when(storeRepository).findAllByCompanyCode(code, pageRequest);
+    doReturn(dto).when(storeConverter).toDTO(store);
+
+    StoreDTO actual = storeService.getNearestStoreByCompanyCode(0.0,0.0,code);
+    assertEquals(dto,actual);
+  }
 
   @Test
-  void addStore() {}
+  void addStore() {
+    StoreDTO dto = storeDTOList.get(0);
+    Store store = stores.get(0);
+    GeoLocationDTO geoLocationDTO = geoLocationDTOS.get(0);
+    GeoLocation geoLocation = geoLocations.get(0);
+    AddressDTO addressDTO = addressDTOS.get(0);
+    Address address = addressList.get(0);
+
+    doReturn(store).when(storeConverter).toEntity(dto);
+    doReturn(address).when(addressConverter).toEntity(addressDTO);
+    doReturn(geoLocation).when(geoLocationConverter).toEntity(geoLocationDTO);
+    doReturn(address).when(addressRepository).save(address);
+    doReturn(geoLocation).when(geoLocationRepository).save(geoLocation);
+    doReturn(store).when(storeRepository).save(store);
+    doReturn(dto).when(storeConverter).toDTO(store);
+    StoreDTO actual = storeService.addStore(dto);
+
+    assertEquals(dto,actual);
+  }
 
   @Test
-  void editStore() {}
+  void editStore() {
+    Optional<Store> storeOptional = Optional.of(stores.get(0));
+    Store storeEdited = stores.get(0);
+    storeEdited.setName("EDIT!!!1");
+    StoreDTO dto = storeDTOList.get(0);
+    StoreDTO dtoEdited = storeDTOList.get(0);
+    dtoEdited.setName("EDIT!!!!");
+
+    doReturn(dto).when(storeConverter).toDTO(storeOptional.get());
+    doReturn(storeOptional).when(storeRepository).findById(storeOptional.get().getId());
+
+    GeoLocationDTO geoLocationDTO = geoLocationDTOS.get(0);
+    GeoLocation geoLocation = geoLocations.get(0);
+    AddressDTO addressDTO = addressDTOS.get(0);
+    Address address = addressList.get(0);
+
+    doReturn(storeEdited).when(storeConverter).toEntity(dtoEdited);
+    doReturn(address).when(addressConverter).toEntity(addressDTO);
+    doReturn(geoLocation).when(geoLocationConverter).toEntity(geoLocationDTO);
+    doReturn(address).when(addressRepository).save(address);
+    doReturn(geoLocation).when(geoLocationRepository).save(geoLocation);
+    doReturn(storeEdited).when(storeRepository).save(storeEdited);
+    doReturn(dtoEdited).when(storeConverter).toDTO(storeEdited);
+
+    StoreDTO actual = storeService.editStore(storeOptional.get().getId(), dtoEdited);
+
+    assertEquals(dtoEdited,actual);
+  }
 
   @Test
-  void deleteStore() {}
+  void deleteStore() {
+    Optional<Store> storeOptional = Optional.of(stores.get(0));
+    StoreDTO dto = storeDTOList.get(0);
+
+    doReturn(dto).when(storeConverter).toDTO(storeOptional.get());
+    doReturn(storeOptional).when(storeRepository).findById(storeOptional.get().getId());
+
+    storeService.deleteStore(storeOptional.get().getId());
+  }
 
   private List<StoreDTO> initStoreDTOS() {
     StoreDTO expectedStoreDTO1 = StoreDTO.builder()
