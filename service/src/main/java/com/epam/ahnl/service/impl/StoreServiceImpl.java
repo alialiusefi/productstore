@@ -14,12 +14,15 @@ import com.epam.ahnl.repository.AddressRepository;
 import com.epam.ahnl.repository.GeoLocationRepository;
 import com.epam.ahnl.repository.StoreRepository;
 import com.epam.ahnl.service.StoreService;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -50,9 +53,15 @@ public class StoreServiceImpl implements StoreService {
   public PageDTO<StoreDTO> getAllStores(Integer size, Integer page) {
     Page<Store> pageObj = storeRepository.findAll(PageRequest.of(page - 1, size));
 
-    List storeDTOS = pageObj.getContent().stream().map(storeConverter::toDTO).collect(Collectors.toList());
+    List storeDTOS = pageObj.getContent()
+        .stream()
+        .map(storeConverter::toDTO)
+        .collect(Collectors.toList());
 
-    return PageDTO.builder().results(storeDTOS).totalResults(pageObj.getTotalElements()).build();
+    return PageDTO.builder()
+        .results(storeDTOS)
+        .totalResults(pageObj.getTotalElements())
+        .build();
   }
 
   @Override
@@ -63,14 +72,19 @@ public class StoreServiceImpl implements StoreService {
 
     List stores = pageObj.getContent().stream().map(storeConverter::toDTO).collect(Collectors.toList());
 
-    return PageDTO.builder().results(stores).totalResults(pageObj.getTotalElements()).build();
+    return PageDTO.builder()
+        .results(stores)
+        .totalResults(pageObj.getTotalElements())
+        .build();
   }
 
-  // todo: think of a db function realization
+  //todo: optional getNearestStore
   @Override
   public StoreDTO getNearestStoreByCompanyCode(
       Double latitude, Double longitude, CompanyCode code) {
-    throw new UnsupportedOperationException("Not implemented yet!");
+    Page<Store> stores = storeRepository.findAllByCompanyCode(code, Pageable.unpaged());
+    Store nearestStore = getNearestStore(latitude, longitude, stores);
+    return storeConverter.toDTO(nearestStore);
   }
 
   @Transactional
@@ -118,6 +132,21 @@ public class StoreServiceImpl implements StoreService {
   public void deleteStore(Long storeId) {
     StoreDTO dto = getStore(storeId);
     storeRepository.deleteById(storeId);
+  }
+
+  private Store getNearestStore(Double givenLatitude, Double givenLongitude, Page<Store> stores) {
+    Function<Store, Double> getDistance =
+        store -> {
+          Double storeLongitude = store.getGeoLocation().getLongitude();
+          Double storeLatitude = store.getGeoLocation().getLatitude();
+          return Math.sqrt(
+              Math.pow(storeLongitude - givenLongitude, 2)
+                  + Math.pow(storeLatitude - givenLatitude, 2));
+        };
+    return stores
+        .get()
+        .min(Comparator.comparing(getDistance))
+        .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOTFOUND_MESSAGE));
   }
 
 }

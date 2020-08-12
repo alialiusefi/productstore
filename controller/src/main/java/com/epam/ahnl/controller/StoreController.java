@@ -4,10 +4,7 @@ import com.epam.ahnl.dto.PageDTO;
 import com.epam.ahnl.dto.StoreDTO;
 import com.epam.ahnl.entity.CompanyCode;
 import com.epam.ahnl.service.StoreService;
-import java.util.List;
-import javax.servlet.ServletContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @RestController
 @RequestMapping("/v1/stores")
@@ -39,16 +38,26 @@ public class StoreController {
   }
 
   @GetMapping
-  public PageDTO<StoreDTO> getAllStores(@RequestParam(required = false, defaultValue = "5") Integer size,
+  public PageDTO<StoreDTO> getAllStores(
+      @RequestParam(required = false, defaultValue = "5") Integer size,
       @RequestParam(required = false, defaultValue = "1") Integer page) {
-    return storeService.getAllStores(size, page);
+    PageDTO<StoreDTO> pageDTO = storeService.getAllStores(size, page);
+
+    String url = getUri();
+    pageDTO.setUrl(url);
+
+    return pageDTO;
   }
 
   @GetMapping("/filter/company-code/{code}")
   public PageDTO<StoreDTO> getAllStoresByCompanyCode(
-      @RequestParam(required = false, defaultValue = "5") Integer size, @RequestParam(required = false, defaultValue = "1") Integer page, @PathVariable CompanyCode code) {
+      @RequestParam(required = false, defaultValue = "5") Integer size, @RequestParam(required = false, defaultValue = "1") Integer page,
+      @PathVariable CompanyCode code) {
     PageDTO<StoreDTO> pageDTO = storeService.getAllStoresByCompanyCode(code, size, page);
-    //TODO: String url = ServletConte        get url from request and return
+
+    String url = getUri();
+    pageDTO.setUrl(url);
+
     return pageDTO;
   }
 
@@ -68,4 +77,9 @@ public class StoreController {
   public void deleteStore(@PathVariable Long storeId) {
     storeService.deleteStore(storeId);
   }
+
+  private String getUri() {
+    return ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest().getRequestURI();
+  }
+
 }
