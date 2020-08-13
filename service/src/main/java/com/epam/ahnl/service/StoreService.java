@@ -4,6 +4,7 @@ import com.epam.ahnl.dto.PageDTO;
 import com.epam.ahnl.dto.StoreDTO;
 import com.epam.ahnl.entity.CompanyCode;
 
+
 public interface StoreService {
 
   StoreDTO addStore(StoreDTO storeDTO);

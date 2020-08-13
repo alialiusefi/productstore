@@ -16,17 +16,25 @@ import com.epam.ahnl.repository.StoreRepository;
 import com.epam.ahnl.service.StoreService;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 @Service
 @RequiredArgsConstructor
+@Validated
 public class StoreServiceImpl implements StoreService {
 
   private static final String RESOURCE_NOTFOUND_MESSAGE =
@@ -39,6 +47,8 @@ public class StoreServiceImpl implements StoreService {
   private final GeoLocationConverter geoLocationConverter;
   private final StoreConverter storeConverter;
   private final AddressConverter addressConverter;
+
+  private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
   @Override
   public StoreDTO getStore(Long storeId) {
@@ -89,6 +99,12 @@ public class StoreServiceImpl implements StoreService {
   @Transactional
   @Override
   public StoreDTO addStore(StoreDTO storeDTO) {
+    Set<ConstraintViolation<StoreDTO>> violations =
+        validator.validate(storeDTO);
+    if (!violations.isEmpty()) {
+      throw new ConstraintViolationException("Incorrect Data!", violations);
+    }
+
     Address address = addressConverter.toEntity(storeDTO.getAddress());
     address = addressRepository.save(address);
 
@@ -108,6 +124,12 @@ public class StoreServiceImpl implements StoreService {
   @Transactional
   @Override
   public StoreDTO editStore(Long storeId, StoreDTO newStoreDTO) {
+    Set<ConstraintViolation<StoreDTO>> violations =
+        validator.validate(newStoreDTO);
+    if (!violations.isEmpty()) {
+      throw new ConstraintViolationException("Incorrect Data!", violations);
+    }
+
     Store store =
         storeRepository
             .findById(storeId)
@@ -133,7 +155,6 @@ public class StoreServiceImpl implements StoreService {
   }
 
   @Override
-  @Transactional
   public void deleteStore(Long storeId) {
     StoreDTO dto = getStore(storeId);
     storeRepository.deleteById(storeId);
