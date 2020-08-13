@@ -29,10 +29,10 @@ public class Store {
 
   private String phone;
 
-  @OneToOne(orphanRemoval = true)
+  @OneToOne
   private Address address;
 
-  @OneToOne(orphanRemoval = true)
+  @OneToOne
   private GeoLocation geoLocation;
 
   @Enumerated(EnumType.STRING)

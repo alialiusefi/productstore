@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: admin
+    hikari:
+      initialization-fail-timeout: 0
+    jpa:
+      show-sql: true
+      generate-ddl: false
+      hibernate:
+        ddl-auto: none
+
+server:
+  servlet:
+    context-path: /api

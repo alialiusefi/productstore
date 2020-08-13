@@ -1,4 +1,7 @@
-create table if not exists address
+drop table store;
+drop table address;
+drop table geo_location;
+create table address
 (
     id           bigserial,
     street       text,
@@ -8,16 +11,14 @@ create table if not exists address
     country_code varchar(2)  not null,
     constraint ADDRESS_ID_PK primary key (id)
 );
-
-create table if not exists geo_location
+create table geo_location
 (
     id        bigserial,
     latitude  decimal not null,
     longitude decimal not null,
     constraint GEOLOCATION_ID_PK primary key (id)
 );
-
-create table if not exists store
+create table store
 (
     id             bigserial,
     name           varchar(100) not null,
@@ -26,7 +27,7 @@ create table if not exists store
     geo_location_id bigint       not null,
     company_code   varchar(2)   not null,
     constraint STORE_ID_PK primary key (id),
-    constraint ADDRESS_ID_FK foreign key (address_id) references address,
-    constraint GEOLOCATION_ID_FK foreign key (geo_location_id) references geo_location
+    constraint ADDRESS_ID_FK foreign key (address_id) references address on delete cascade,
+    constraint GEOLOCATION_ID_FK foreign key (geo_location_id) references geo_location on delete cascade
 );
 

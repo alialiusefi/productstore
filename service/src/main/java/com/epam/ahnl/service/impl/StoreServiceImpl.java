@@ -108,26 +108,32 @@ public class StoreServiceImpl implements StoreService {
   @Transactional
   @Override
   public StoreDTO editStore(Long storeId, StoreDTO newStoreDTO) {
-    StoreDTO dto = getStore(storeId);
+    Store store =
+        storeRepository
+            .findById(storeId)
+            .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NOTFOUND_MESSAGE));
 
     Address address = addressConverter.toEntity(newStoreDTO.getAddress());
+    address.setId(store.getAddress().getId());
     address = addressRepository.save(address);
 
     GeoLocation geoLocation = geoLocationConverter.toEntity(newStoreDTO.getGeoLocation());
+    geoLocation.setId(store.getGeoLocation().getId());
     geoLocation = geoLocationRepository.save(geoLocation);
 
-    Store store = storeConverter.toEntity(newStoreDTO);
+    Store newStore = storeConverter.toEntity(newStoreDTO);
 
-    store.setId(dto.getId());
-    store.setAddress(address);
-    store.setGeoLocation(geoLocation);
+    newStore.setId(store.getId());
+    newStore.setAddress(address);
+    newStore.setGeoLocation(geoLocation);
 
-    store = storeRepository.save(store);
+    store = storeRepository.save(newStore);
 
     return storeConverter.toDTO(store);
   }
 
   @Override
+  @Transactional
   public void deleteStore(Long storeId) {
     StoreDTO dto = getStore(storeId);
     storeRepository.deleteById(storeId);

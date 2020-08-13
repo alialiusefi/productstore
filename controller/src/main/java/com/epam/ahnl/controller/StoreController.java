@@ -43,7 +43,7 @@ public class StoreController {
       @RequestParam(required = false, defaultValue = "1") Integer page) {
     PageDTO<StoreDTO> pageDTO = storeService.getAllStores(size, page);
 
-    String url = getUri();
+    String url = getPath();
     pageDTO.setUrl(url);
 
     return pageDTO;
@@ -55,7 +55,7 @@ public class StoreController {
       @PathVariable CompanyCode code) {
     PageDTO<StoreDTO> pageDTO = storeService.getAllStoresByCompanyCode(code, size, page);
 
-    String url = getUri();
+    String url = getPath();
     pageDTO.setUrl(url);
 
     return pageDTO;
@@ -78,7 +78,7 @@ public class StoreController {
     storeService.deleteStore(storeId);
   }
 
-  private String getUri() {
+  private String getPath() {
     return ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest().getRequestURI();
   }
 
