@@ -15,3 +15,7 @@ spring:
 server:
   servlet:
     context-path: /api
+logging:
+  level:
+    root: INFO
+    com.epam.ahnl: INFO

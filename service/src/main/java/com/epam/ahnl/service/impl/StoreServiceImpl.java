@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.Valid;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import lombok.RequiredArgsConstructor;
