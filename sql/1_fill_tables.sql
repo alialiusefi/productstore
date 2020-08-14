@@ -16,4 +16,5 @@ insert into store (name, phone, address_id, geo_location_id, company_code) VALUE
 ('Albert Heign Store','+1-666-6578943',1,1,'AH'),
 ('Clothes Store','+1-666-6578943',2,2,'ET'),
 ('Product Store','+1-666-6578943',3,3,'ET'),
-('Cleaning Products store','+1-666-6578943',4,4,'AH');
+('Cleaning Products store','+1-666-6578943',4,4,'AH'),
+('Store #234','+1-666-6578943',5,5,'AH');
