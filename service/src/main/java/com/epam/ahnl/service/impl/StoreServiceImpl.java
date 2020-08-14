@@ -47,7 +47,7 @@ public class StoreServiceImpl implements StoreService {
   private final StoreConverter storeConverter;
   private final AddressConverter addressConverter;
 
-  private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+  private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
   @Override
   public StoreDTO getStore(Long storeId) {
@@ -155,7 +155,7 @@ public class StoreServiceImpl implements StoreService {
 
   @Override
   public void deleteStore(Long storeId) {
-    StoreDTO dto = getStore(storeId);
+    getStore(storeId);
     storeRepository.deleteById(storeId);
   }
 
